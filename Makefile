@@ -1,11 +1,11 @@
-COM_VAR = tests.txt
-DECOM_VAR = tests-compressed.bin
-compress: compress.c $(COM_VAR)
+CVAR = tests.txt
+DVAR = tests-compressed.bin
+compress: compress.c $(CVAR)
 	$ gcc -o out compress.c -lm
-	$ ./out $(COM_VAR)
+	$ ./out $(CVAR)
 	$ rm out
 
-decompress: decompress.c $(DECOM_VAR)
+decompress: decompress.c $(DVAR)
 	$ gcc -o out decompress.c -lm
-	$ ./out $(DECOM_VAR)
+	$ ./out $(DVAR)
 	$ rm out
