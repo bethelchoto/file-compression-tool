@@ -42,8 +42,9 @@ void compressRLE(Image *input, FILE *output) {
 
 int main() {
     // Load image using stb_image
+    const char *input_image_filename = "input_image.bmp";
     int width, height, channels;
-    unsigned char *image_data = stbi_load("input_image.bmp", &width, &height, &channels, STBI_rgb);
+    unsigned char *image_data = stbi_load(input_image_filename, &width, &height, &channels, STBI_rgb);
 
     if (image_data == NULL) {
         printf("Failed to load image\n");
@@ -65,10 +66,21 @@ int main() {
         input.pixels[i].b = image_data[i * 3 + 2];
     }
 
-    printf("Image converted to pixel array successfully\n");
+    printf("Image converted to pixel array successfully\n"); 
 
+    // Extract base filename without extension
+    char *base_filename = strdup(input_image_filename);
+    char *ext = strrchr(base_filename, '.');
+    if (ext != NULL) {
+        *ext = '\0'; // Remove the extension
+    }
+
+    // Create output filename based on the input image filename
+    char output_filename[256]; // Adjust the size as needed
+    snprintf(output_filename, sizeof(output_filename), "%s_compressed.bin", base_filename);
+    
     // Compressing the image
-    FILE *compressedFile = fopen("img_compressed.bin", "wb");
+    FILE *compressedFile = fopen(output_filename, "wb");
     if (compressedFile != NULL) {
         printf("File opened successfully for writing\n");
         compressRLE(&input, compressedFile);

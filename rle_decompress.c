@@ -45,10 +45,24 @@ void saveImage(char* filename, int width, int height, Pixel* pixels) {
     stbi_write_jpg(filename, width, height, 3, pixels, width * sizeof(Pixel));
 }
 
-int main() {
+int main(int argc, char **argv) {
+
+    if (argc != 2)
+    {
+        printf("this is not how we decompress here- ./out <file>\n");
+        exit(1);
+    }
+    
+    const char* filename = argv[1];
+
+    char *base_filename = strdup(filename);
+    char *ext = strstr(base_filename, "_compressed.");
+    if (ext != NULL) {
+        *ext = '\0'; // Remove the extension
+    }
 
     // Decompressing the image
-    FILE *decompressedFile = fopen("img_compressed.bin", "rb");
+    FILE *decompressedFile = fopen(filename, "rb");
     if (decompressedFile != NULL) {
         printf("File opened successfully for reading\n");
         Image *output = decompressRLE(decompressedFile);
@@ -57,9 +71,9 @@ int main() {
 
         printf("Decompressed image dimensions: %d x %d\n", output->width, output->height);
 
-        // Save the decompressed image
-        char output_filename[100]; // Adjust size accordingly
-        sprintf(output_filename, "%s_decompressed.jpg", "input_image");
+        // Create output filename based on the input image filename
+        char output_filename[256]; // Adjust the size as needed
+        snprintf(output_filename, sizeof(output_filename), "%s_decompressed.jpg", base_filename);
         saveImage(output_filename, output->width, output->height, output->pixels);
         printf("Decompressed image saved as %s\n", output_filename);
 

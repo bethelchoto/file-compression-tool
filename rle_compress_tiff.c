@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <tiffio.h> // Include LibTIFF header
@@ -36,7 +37,7 @@ uint32_t* loadImage(const char* filename, int* width, int* height) {
     }
 
     // Read image data
-    if (!TIFFReadRGBAImage(tif, *width, *height, pixels, 0)) {
+    if (!TIFFReadRGBAImageOriented(tif, *width, *height, pixels, ORIENTATION_TOPRIGHT, 0)) {
         fprintf(stderr, "Failed to read image data\n");
         free(pixels);
         TIFFClose(tif);
@@ -69,10 +70,9 @@ void compressRLE(const char* filename, FILE *output) {
     // Convert RGBA to RGB format
     for (int i = 0; i < width * height; i++) {
         uint32_t pixelValue = pixels[i];
-        printf("Pixel %d: 0x%X\n", i, pixelValue);
-        input.pixels[i].r = (pixelValue >> 24) & 0xFF; // Red
-        input.pixels[i].g = (pixelValue >> 16) & 0xFF; // Green
-        input.pixels[i].b = (pixelValue >> 8) & 0xFF;  // Blue
+        input.pixels[i].r = (pixelValue) & 0xFF; // Red
+        input.pixels[i].g = (pixelValue >> 8) & 0xFF; // Green
+        input.pixels[i].b = (pixelValue >> 16) & 0xFF;  // Blue
     }
 
     free(pixels); // Free allocated memory for pixel array
@@ -107,11 +107,24 @@ void compressRLE(const char* filename, FILE *output) {
 }
 
 int main() {
-    // Compressing the image
-    FILE *compressedFile = fopen("img_compressed.bin", "wb");
+
+    const char *input_image_filename = "input_image_large.tiff";
+
+    // Extract base filename without extension
+    char *base_filename = strdup(input_image_filename);
+    char *ext = strrchr(base_filename, '.');
+    if (ext != NULL) {
+        *ext = '\0'; // Remove the extension
+    }
+
+    // Create output filename based on the input image filename
+    char output_filename[256]; // Adjust the size as needed
+    snprintf(output_filename, sizeof(output_filename), "%s_compressed.bin", base_filename);
+
+    FILE *compressedFile = fopen(output_filename, "wb");
     if (compressedFile != NULL) {
         printf("File opened successfully for writing\n");
-        compressRLE("input_image.tiff", compressedFile);
+        compressRLE(input_image_filename, compressedFile);
         fclose(compressedFile);
     } else {
         printf("Failed to open file for writing\n");
