@@ -40,6 +40,7 @@ void compressRLE(Image *input, FILE *output) {
 }
 
 
+<<<<<<< HEAD
 int main(int argc, char *argv[]) {
     // Load image using stb_image
 
@@ -50,6 +51,11 @@ int main(int argc, char *argv[]) {
 
     const char *input_image_filename = argv[1];
 
+=======
+int main() {
+    // Load image using stb_image
+    const char *input_image_filename = "input_image.bmp";
+>>>>>>> 2d5ea1844e8419dd0d653eda3030dcd00f61d477
     int width, height, channels;
     unsigned char *image_data = stbi_load(input_image_filename, &width, &height, &channels, STBI_rgb);
 
@@ -100,4 +106,8 @@ int main(int argc, char *argv[]) {
 
 
     return 0;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 2d5ea1844e8419dd0d653eda3030dcd00f61d477
