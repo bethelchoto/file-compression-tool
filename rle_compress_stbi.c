@@ -40,9 +40,16 @@ void compressRLE(Image *input, FILE *output) {
 }
 
 
-int main() {
+int main(int argc, char *argv[]) {
     // Load image using stb_image
-    const char *input_image_filename = "input_image.bmp";
+
+    if (argc != 2) {
+        fprintf(stderr, "Invalid cmd line arg. Usage: ./a.out <input file>\n");
+        return 1;
+    }
+
+    const char *input_image_filename = argv[1];
+
     int width, height, channels;
     unsigned char *image_data = stbi_load(input_image_filename, &width, &height, &channels, STBI_rgb);
 
