@@ -106,9 +106,21 @@ void compressRLE(const char* filename, FILE *output) {
     free(input.pixels);
 }
 
+<<<<<<< HEAD
+int main(int argc, char *argv[]) {
+    // Load image using stb_image
+
+    if (argc != 2) {
+        fprintf(stderr, "Invalid cmd line arg. Usage: ./a.out <input file>\n");
+        return 1;
+    }
+
+    const char *input_image_filename = argv[1];
+=======
 int main() {
 
     const char *input_image_filename = "input_image_large.tiff";
+>>>>>>> 2d5ea1844e8419dd0d653eda3030dcd00f61d477
 
     // Extract base filename without extension
     char *base_filename = strdup(input_image_filename);
