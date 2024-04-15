@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
     const char* filename = argv[1];
 
     char *base_filename = strdup(filename);
-    char *ext = strstr(base_filename, "_compressed.");
+    char *ext = strstr(base_filename, "-compressed.");
     if (ext != NULL) {
         *ext = '\0'; // Remove the extension
     }
@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
 
         // Create output filename based on the input image filename
         char output_filename[256]; // Adjust the size as needed
-        snprintf(output_filename, sizeof(output_filename), "%s_decompressed.jpg", base_filename);
+        snprintf(output_filename, sizeof(output_filename), "%s-decompressed.jpg", base_filename);
         saveImage(output_filename, output->width, output->height, output->pixels);
         printf("Decompressed image saved as %s\n", output_filename);
 
