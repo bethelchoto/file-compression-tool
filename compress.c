@@ -174,7 +174,7 @@ int main(int argc, char *argv[]) {
     // get the first section of the filename
     char out[MAX_FILENAME_LENGTH];
     strncpy(out, in, strchr(in, '.') - in);
-    strcat(out, "-compressed.bin");
+    strcat(out, "_compressed.bin");
     // dir
 
     // initialize the outfile, open as binary for writing
