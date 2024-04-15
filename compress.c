@@ -2,7 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include "error_handling.h"
+
 #define MAX_FILENAME_LENGTH 100
+#define SPLIT_STRING "_compressed.bin"
 
 struct huffnode {
     char character;
@@ -154,14 +157,14 @@ int main(int argc, char *argv[]) {
 
     // catch error from unpassed file
     if (argc != 2) {
-        printf("Invalid cmd line arg. Usage: ./out <input file>\n");
+        report_error(ERROR_INVALID_CMD_ARG);
         return 1;
     }
     
     // open file for reading and compression
     FILE *input = fopen(argv[1], "r");
     if (input == NULL) {
-        printf("Error opening input file\n");
+        report_error(ERROR_OPEN_INPUT_FILE);
         return 2;
     }
 
@@ -174,13 +177,13 @@ int main(int argc, char *argv[]) {
     // get the first section of the filename
     char out[MAX_FILENAME_LENGTH];
     strncpy(out, in, strchr(in, '.') - in);
-    strcat(out, "_compressed.bin");
+    strcat(out, SPLIT_STRING);
     // dir
 
     // initialize the outfile, open as binary for writing
     FILE *output = fopen(out, "wb");
     if (output == NULL) {
-        printf("Error creating output file\n");
+        report_error(ERROR_CREATE_OUTPUT_FILE);
         return 3;
     }
 
@@ -268,7 +271,7 @@ int main(int argc, char *argv[]) {
     // Create padding_string with '0's for padding
     char *padding_string = (char *)malloc(padding + 1); // +1 for null terminator
     if (padding_string == NULL) {
-        printf("Memory allocation failed\n");
+        report_error(ERROR_MEMORY_ALLOCATION);
         return 1;
     }
     memset(padding_string, '0', padding); // Initialize with '0's
