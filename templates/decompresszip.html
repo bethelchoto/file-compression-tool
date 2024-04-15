@@ -1,25 +1,20 @@
 <!DOCTYPE html>
 <html lang="en" >
-
-    <head>
-        <meta charset="utf-8"/>
-        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes"/>
-    
-        <link rel="preconnect" href="https://dragon.compress2go.com/" crossorigin>
-        <link rel="preconnect" href="https://stats.compress2go.com/" crossorigin>
-    
-        <title>Compress PDF - Online PDF document compression</title>
-       
-        <link rel="stylesheet" href="{{ url_for('static', filename='assets/dist/3509.6d5bcb31.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='assets/dist/7088.9e4632fe.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='assets/dist/qg-feature.43f8900a.css') }}">
-    </head>
+<head>
+    <meta charset="utf-8"/>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes"/>
+    <link rel="preconnect" href="https://dragon.compress2go.com/" crossorigin>
+    <link rel="preconnect" href="https://stats.compress2go.com/" crossorigin>
+    <title>Decompress Files</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/dist/3509.6d5bcb31.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/dist/7088.9e4632fe.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/dist/qg-feature.43f8900a.css') }}">
+</head>
 
 <body class="lang-en"   >
     <div id="userNotifications">
 </div>
-
 
 <div id="header" class="w-100 bg-white z-index-3 position-relative header-height-60">
     <div class="px-4 pl-4 pt-0 h-100">
@@ -41,8 +36,6 @@
     </div>
 </div>
 
-
-
 <div id="post-header" class="post-header">
     <div class="color-stripe row w-100 no-margin ">
         <div class="bg-main-1"></div>
@@ -60,29 +53,23 @@
         <div id="downloadEngineApp"></div>
             <div class="main-content sub subcontent">
                 <div id="recaptchaContainer"></div>
-
                 <div class="container content-header">
-                        <div class="w-100 mx-0">
-                            <h1>Compress PDF</h1>
-                            <h2 class="text-left">Use this PDF compressor to reduce the file size of your PDF documents. Make PDFs smaller to send them via e-mail or upload them to the internet.</h2>
-                        </div>
+                    <div class="w-100 mx-0">
+                        <h1>Decompress Files</h1>
+                        <h2 class="text-left">Use this application to decompress images</h2>
+                    </div>
                 </div>
-    
-    
-    
+
         <div class="container">
             <div class="row">
                 <div class="col-md-12 col-lg-12 d-flex flex-column gap-10">
-
                     <div class="row">
                         <div class="col-md-12 col-lg-12 d-flex flex-column gap-10">
                             <div class="row">
-    
                                 <div class="col-12">
                                     <div class="upload-container">                                                               
                                         <div class="uploadbox-wrapper d-flex flex-column gap-5">
-    
-                                            <form action="/compressdoc" method="POST" enctype="multipart/form-data">
+                                            <form action="/decompressedzip" method="POST" enctype="multipart/form-data">
                                                 <div id="vue-uploadbox" class="vue-uploadbox-wrap p-10 bg-lighten br-8 position-relative bg-main-2">
                                                     <div class="d-flex br-8 fg-white h-100 w-100 border-white border-dashed border-1 bg-main-2">
                                                         <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center gap-150">
@@ -138,19 +125,17 @@
         </div>
         </div>
     </div>
-
       
-    <h1>Compression Result</h1>
+    <h1>Decompression Result</h1>
     {% if check == 1 %}
-        <p>The document has been compressed successfully Download HERE!.</p>
+        <p>The document has been decompressed successfully.</p>
         <p>DOWNLOAD HERE!</p>
-        <p><a href="/download/{{ filename }}{{ ftype }}">Download Compressed Document</a></p>
+        <p><a href="/download/{{ filename }}">Download decompressed file</a></p>
     {% elif check == -1 %}
         <p>Error occurred during compression.</p>
     {% else %}
         <p>No file selected for compression.</p>
     {% endif %}
-
 
     <div class="content-breaker pb-0 ">
         <div class="color-stripe row w-100 no-margin ">
@@ -168,6 +153,5 @@
     <div id="qg-toast-container">
         <div id="qg-toast"></div>
     </div>
-
     </body>
 </html>
