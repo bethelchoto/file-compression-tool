@@ -10,6 +10,7 @@ global filename
 global ftype
 
 @app.route("/")
+@app.route("/home")
 def home():
         # Delete old files
     filelist = glob.glob('uploads/*')
@@ -40,8 +41,11 @@ def compress_doc():
 def compress_archive():
     return render_template("create-archive.html")
 
+current_directory = os.path.dirname(os.path.abspath(__file__))
 
-app.config["FILE_UPLOADS"] = "/home/panashe/file-compression-tool/uploads"
+file_upload_directory = os.path.join(current_directory, "uploads")
+
+app.config["FILE_UPLOADS"] = file_upload_directory
 
 @app.route("/compressimage", methods=["GET", "POST"])
 def compressimage():
@@ -55,7 +59,7 @@ def compressimage():
             filename = up_file.filename
             print(up_file.filename)
             up_file.save(os.path.join(app.config["FILE_UPLOADS"], filename))
-            os.system('./images_compress uploads/{}'.format(filename))            
+            os.system('./img_compress uploads/{}'.format(filename))            
             filename = filename[:filename.index(".",1)]
             ftype = "_compressed.bin"
     
@@ -85,13 +89,13 @@ def compressdoc():
             filename = up_file.filename
             print(up_file.filename)
             up_file.save(os.path.join(app.config["FILE_UPLOADS"], filename))
-            os.system('./c uploads/{}'.format(filename))            
+            os.system('./doc_compress uploads/{}'.format(filename))            
             filename = filename[:filename.index(".",1)]
-            ftype = "-compressed.bin"
+            ftype = "_compressed.bin"
 
             while True:
-                if 'uploads/{}-compressed.bin'.format(filename) in glob.glob('uploads/*-compressed.bin'):
-                    os.system('mv uploads/{}-compressed.bin downloads/'.format(filename))
+                if 'uploads/{}_compressed.bin'.format(filename) in glob.glob('uploads/*_compressed.bin'):
+                    os.system('mv uploads/{}_compressed.bin downloads/'.format(filename))
                     break
             return render_template("compress-doc.html", check=1, filename=filename, ftype=ftype)
         else:
@@ -148,11 +152,11 @@ def compressbin():
             os.system('./rle_bin uploads/{}'.format(filename))            
             filename = filename[:filename.index(".",1)]
 
-            ftype = "-compressed.bin"
+            ftype = "_compressed.bin"
 
             while True:
-                if 'uploads/{}-compressed.bin'.format(filename) in glob.glob('uploads/*-compressed.bin'):
-                    os.system('mv uploads/{}-compressed.bin downloads/'.format(filename))
+                if 'uploads/{}_compressed.bin'.format(filename) in glob.glob('uploads/*_compressed.bin'):
+                    os.system('mv uploads/{}_compressed.bin downloads/'.format(filename))
                     break
             return render_template("index.html", check=1)
 
@@ -165,8 +169,12 @@ app.config["DOWNLOAD_FOLDER"] = "downloads/"
 def download_file(filename):
     return send_from_directory(app.config["DOWNLOAD_FOLDER"], filename, as_attachment=True)     
 
+@app.route("/index2")
+@app.route("/decompress")
+def decomp():
+    return render_template("de-index.html")
 
-@app.route("/decompress", methods=["GET", "POST"])
+@app.route("/decompressimg", methods=["GET", "POST"])
 def decompress():
     if request.method == "GET":
         return render_template("decompress.html", check=0)
@@ -176,15 +184,14 @@ def decompress():
             global filename
             global ftype
             filename = up_file.filename
-            print(up_file.filename)
             up_file.save(os.path.join(app.config["FILE_UPLOADS"], filename))
-            os.system('./d uploads/{}'.format(filename))
+            os.system('./img_decompress uploads/{}'.format(filename))
             f = open('uploads/{}'.format(filename), 'rb')
-            ftype = "-decompressed." + (f.read(int(f.read(1)))).decode("utf-8")
-            filename = filename[:filename.index("-",1)]
+            ftype = "_decompressed." + "jpg" # make this user choice btwn png/jpg
+            filename = filename[:filename.index("_compressed",1)]
 
             while True:
-                if 'uploads/{}{}'.format(filename, ftype) in glob.glob('uploads/*-decompressed.*'):
+                if 'uploads/{}{}'.format(filename, ftype) in glob.glob('uploads/*_decompressed.*'):
                     os.system('mv uploads/{}{} downloads/'.format(filename, ftype))
                     break
             # return render_template("decompress.html", check=1)
@@ -192,6 +199,32 @@ def decompress():
         else:
             print("ERROR")
             return render_template("decompress.html", check=-1)
+        
+@app.route("/decompressfile", methods=["GET", "POST"])
+def decompressfile():
+    if request.method == "GET":
+        return render_template("decompressfile.html", check=0)
+    else:
+        up_file = request.files["file"]
+        if len(up_file.filename) > 0:
+            global filename
+            global ftype
+            filename = up_file.filename
+            up_file.save(os.path.join(app.config["FILE_UPLOADS"], filename))
+            os.system('./doc_decompress uploads/{}'.format(filename))
+            f = open('uploads/{}'.format(filename), 'rb')
+            ftype = "_decompressed." + (f.read(int(f.read(1)))).decode("utf-8")
+            filename = filename[:filename.index("_",1)]
+
+            while True:
+                if 'uploads/{}{}'.format(filename, ftype) in glob.glob('uploads/*_decompressed.*'):
+                    os.system('mv uploads/{}{} downloads/'.format(filename, ftype))
+                    break
+            # return render_template("decompress.html", check=1)
+            return render_template("decompressfile.html", check=1, filename=filename, ftype=ftype)
+        else:
+            print("ERROR")
+            return render_template("decompressfile.html", check=-1)
 
 # Run the Flask application
 if __name__ == "__main__":

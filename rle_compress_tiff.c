@@ -125,7 +125,7 @@ int main(int argc, char *argv[]) {
 
     // Create output filename based on the input image filename
     char output_filename[256]; // Adjust the size as needed
-    snprintf(output_filename, sizeof(output_filename), "%s-compressed.bin", base_filename);
+    snprintf(output_filename, sizeof(output_filename), "%s_compressed.bin", base_filename);
 
     FILE *compressedFile = fopen(output_filename, "wb");
     if (compressedFile != NULL) {

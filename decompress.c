@@ -76,9 +76,9 @@ int main(int argc, char *argv[]) {
     }
 
     // Find the position of "-compressed" in the input filename
-    char *pos = strstr(argv[1], "-compressed");
+    char *pos = strstr(argv[1], "_compressed");
     if (pos == NULL) {
-        fprintf(stderr, "Error: Input file name does not contain \"-compressed\"\n");
+        fprintf(stderr, "Error: Input file name does not contain \"_compressed\"\n");
         fclose(input);
         return 1;
     }
@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
     // Construct the output filename
     strncpy(out, argv[1], prefix_length);
     out[prefix_length] = '\0'; // Null-terminate the string
-    strcat(out, "-decompressed.");
+    strcat(out, "_decompressed.");
 
     char buff[1];
     // Read file extension length and the extension itself
