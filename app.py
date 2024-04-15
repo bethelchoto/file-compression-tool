@@ -25,19 +25,19 @@ def home():
         os.remove(f)
     return render_template("index.html")
 
-@app.route("/compress_image")
+@app.route("/compressimage")
 def compress_image():
     return render_template("compress-image.html")
 
-@app.route("/compress_zip")
+@app.route("/compresszip")
 def compress_zip():
     return render_template("compress-zip.html")
 
-@app.route("/compress_tiff")
+@app.route("/compresstiff")
 def compress_tiff():
     return render_template("compress-tiff.html")
 
-@app.route("/compress_doc")
+@app.route("/compressdoc")
 def compress_doc():
     return render_template("compress-doc.html")
 
@@ -63,14 +63,14 @@ def compresszip():
             filename = up_file.filename
             print(up_file.filename)
             up_file.save(os.path.join(app.config["FILE_UPLOADS_TEMP"], filename))
-            os.system('./zipper compress temp zipped/zipped.gz'.format(filename))            
+            os.system('./executables/zipper compress temp zipped/zipped.gz')            
             filename = "zipped"
             ftype = ".gz"
             while True:
                 if 'zipped/zipped.gz' in glob.glob('zipped/*.gz'):
                     os.system('mv zipped/zipped.gz downloads/')
                     break
-            # return render_template("index.html", check=1)
+            
             return render_template("compress-zip.html", check=1, filename=filename, ftype=ftype)
         else:
             print("ERROR")
@@ -92,14 +92,14 @@ def compressimage():
             filename = up_file.filename
             print(up_file.filename)
             up_file.save(os.path.join(app.config["FILE_UPLOADS"], filename))
-            os.system('./img_compress uploads/{}'.format(filename))            
+            os.system('./executables/img_compress uploads/{}'.format(filename))            
             filename = filename[:filename.index(".",1)]
             ftype = "_compressed.bin"
             while True:
                 if 'uploads/{}_compressed.bin'.format(filename) in glob.glob('uploads/*_compressed.bin'):
                     os.system('mv uploads/{}_compressed.bin downloads/'.format(filename))
                     break
-            # return render_template("index.html", check=1)
+           
             return render_template("compress-image.html", check=1, filename=filename, ftype=ftype)
 
         else:
@@ -119,7 +119,7 @@ def compressdoc():
             filename = up_file.filename
             print(up_file.filename)
             up_file.save(os.path.join(app.config["FILE_UPLOADS"], filename))
-            os.system('./doc_compress uploads/{}'.format(filename))            
+            os.system('./executables/doc_compress uploads/{}'.format(filename))            
             filename = filename[:filename.index(".",1)]
             ftype = "_compressed.bin"
 
@@ -144,7 +144,7 @@ def compresstiff():
             filename = up_file.filename
             print(up_file.filename)
             up_file.save(os.path.join(app.config["FILE_UPLOADS"], filename))
-            os.system('./tiff_compress uploads/{}'.format(filename))            
+            os.system('./executables/tiff_compress uploads/{}'.format(filename))            
             filename = filename[:filename.index(".",1)]
             ftype = "_compressed.bin"
             while True:
@@ -156,32 +156,6 @@ def compresstiff():
             print("ERROR")
             return render_template("index.html", check=-1)
         
-@app.route("/compressbin", methods=["GET", "POST"])
-def compressbin():
-    if request.method == "GET":
-        return render_template("compress-bin.html", check=0)
-    else:
-        up_file = request.files["file"]
-        if len(up_file.filename) > 0:
-            global filename
-            global ftype
-            filename = up_file.filename
-            print(up_file.filename)
-            up_file.save(os.path.join(app.config["FILE_UPLOADS"], filename))
-            os.system('./rle_bin uploads/{}'.format(filename))            
-            filename = filename[:filename.index(".",1)]
-
-            ftype = "_compressed.bin"
-
-            while True:
-                if 'uploads/{}_compressed.bin'.format(filename) in glob.glob('uploads/*_compressed.bin'):
-                    os.system('mv uploads/{}_compressed.bin downloads/'.format(filename))
-                    break
-            return render_template("index.html", check=1)
-        else:
-            print("ERROR")
-            return render_template("index.html", check=-1)
-
 app.config["DOWNLOAD_FOLDER"] = "downloads/"
 @app.route("/download/<filename>")
 def download_file(filename):
@@ -203,7 +177,7 @@ def decompress():
             global ftype
             filename = up_file.filename
             up_file.save(os.path.join(app.config["FILE_UPLOADS"], filename))
-            os.system('./img_decompress uploads/{}'.format(filename))
+            os.system('./executables/img_decompress uploads/{}'.format(filename))
             f = open('uploads/{}'.format(filename), 'rb')
             ftype = "_decompressed." + "jpg" # make this user choice btwn png/jpg
             filename = filename[:filename.index("_compressed",1)]
@@ -228,10 +202,10 @@ def decompressfile():
             global ftype
             filename = up_file.filename
             up_file.save(os.path.join(app.config["FILE_UPLOADS"], filename))
-            os.system('./doc_decompress uploads/{}'.format(filename))
+            os.system('./executables/doc_decompress uploads/{}'.format(filename))
             f = open('uploads/{}'.format(filename), 'rb')
             ftype = "_decompressed." + (f.read(int(f.read(1)))).decode("utf-8")
-            filename = filename[:filename.index("_",1)]
+            filename = filename[:filename.index("_compressed",1)]
 
             while True:
                 if 'uploads/{}{}'.format(filename, ftype) in glob.glob('uploads/*_decompressed.*'):
@@ -257,7 +231,7 @@ def decompressedzip():
             # up_file.save(os.path.join(app.config["FILE_UPLOADS"], filename))
 
             up_file.save(os.path.join(app.config["FILE_UPLOADS"], filename))
-            os.system('./zipper decompress uploads/zipped.gz downloads'.format(filename))  
+            os.system('./executables/zipper decompress uploads/zipped.gz downloads'.format(filename))  
 
             filename = glob.glob(os.path.join('downloads/', "file_0*"))[0]
             filename = filename.split("/")[1]

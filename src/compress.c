@@ -178,7 +178,6 @@ int main(int argc, char *argv[]) {
     char out[MAX_FILENAME_LENGTH];
     strncpy(out, in, strchr(in, '.') - in);
     strcat(out, SPLIT_STRING);
-    // dir
 
     // initialize the outfile, open as binary for writing
     FILE *output = fopen(out, "wb");
@@ -287,7 +286,6 @@ int main(int argc, char *argv[]) {
     padded_file_contents[padding_size] = '\0';
 
     // Write the codes assigned to characters at the start of the file
-    // Calculate the length of the code
     for (int i = 0; i < 256; i++) {
         if (hashmap[i].value != NULL){
            
