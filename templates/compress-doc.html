@@ -1,153 +1,50 @@
 <!DOCTYPE html>
 <html lang="en" >
 
-<head>  
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes"/>
-    <link rel="preload" href="{{ url_for('static', filename='assets/dist/fonts/mem5YaGs126MiZpBA-UNirkOX-hpOqc.f784b6eb.woff2') }}" as="font" type="font/woff2" crossorigin="anonymous">
-    <link rel="preload" href="{{ url_for('static', filename='assets/dist/fonts/mem5YaGs126MiZpBA-UNirkOUuhv.7e06644b.woff') }}" as="font" type="font/woff" crossorigin="anonymous">
-    <link rel="preload" href="{{ url_for('static', filename='assets/dist/fonts/mem8YaGs126MiZpBA-UFVZ0d.347639ec.woff') }}" as="font" type="font/woff" crossorigin="anonymous">
-    <link rel="preload" href="{{ url_for('static', filename='assets/dist/fonts/fa-solid-900.f37f3d68.woff2') }}" as="font" type="font/woff2" crossorigin="anonymous">
-    <link rel="preload" href="{{ url_for('static', filename='assets/dist/fonts/fa-regular-400.445f0cfc.woff2') }}" as="font" type="font/woff2" crossorigin="anonymous">
-    <link rel="preload" href="{{ url_for('static', filename='assets/dist/fonts/fa-light-200.6ee2e1f4.woff2') }}" as="font" type="font/woff2" crossorigin="anonymous">
-    <link rel="preload" href="{{ url_for('static', filename='assets/dist/fonts/fa-brands.8fbd5b1a.woff2') }}" as="font" type="font/woff2" crossorigin="anonymous">
-
-    <title>File Compressor</title>
-
-    <meta name="description" content="The best tool to reduce the file size of your files."/>
-    <link rel="canonical" href="index.html"/>
-    <link rel="stylesheet" href="{{ url_for('static', filename='assets/dist/3509.6d5bcb31.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='assets/dist/qg-index.d73ab9b9.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='assets/dist/3509.6d5bcb31.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='assets/dist/7088.9e4632fe.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='assets/dist/qg-feature.43f8900a.css') }}">
-
-</head>
-
-<body class="lang-en">
-    <div id="userNotifications">
-        <!-- do not delete this tag -->
-    </div>
-
-    <div id="header" class="w-100 bg-white z-index-3 position-relative header-height-60">
-        <div class="px-4 pl-4 pt-0 h-100">
-            <div class="row justify-content-between h-100">
-                <nav class="navbar d-flex z-index-2 px-0 py-0 position-static h-100 justify-content-between flex-grow-md-0">
-                    <div class="d-flex h-100 align-items-center pl-1 md-pl-4">
-                        <a class="navbar-brand pr-4 d-flex justify-content-start mr-0"
-                            href="index.html"
-                            title="Different tools to compress all kinds of files">
-                            <h3 class="font-weight-bold text-capitalize text-center">File Compressor</h3> 
-                        </a>
-                    </div>
-                </nav>
-            </div>
-        </div>
-    </div>
-
-
+    <head>
+        <meta charset="utf-8"/>
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes"/>
     
+        <link rel="preconnect" href="https://dragon.compress2go.com/" crossorigin>
+        <link rel="preconnect" href="https://stats.compress2go.com/" crossorigin>
+    
+        <title>Compress PDF - Online PDF document compression</title>
+       
+        <link rel="stylesheet" href="{{ url_for('static', filename='assets/dist/3509.6d5bcb31.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='assets/dist/7088.9e4632fe.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='assets/dist/qg-feature.43f8900a.css') }}">
+    </head>
 
-    <div class="">
-        <div id="downloadEngineApp"></div>
-        <div class="main-content sub subcontent">
-        <div id="recaptchaContainer"></div>
-            <div class="container content-header">
- 
-            </div>
-        
-            <div class="container">
-
-                <div class="container content-header">
-                    <div class="w-100 mx-0">
-                        <h1>Compress Images</h1>
-                        <h2 class="text-left">Use this image compressor to reduce JPEG, PNG, GIF, and BMP file sizes for easier sharing via email or uploading to the internet.</h2>
-                    </div>
-            </div>
+<body class="lang-en"   >
+    <div id="userNotifications">
+</div>
 
 
-
-                <div class="row">
-                    <div class="col-md-12 col-lg-12 d-flex flex-column gap-10">
-                        <div class="row">
-
-                            <div class="col-12">
-                                <div class="upload-container">                                                               
-                                    <div class="uploadbox-wrapper d-flex flex-column gap-5">
-
-                                        <form action="/compressdoc" method="POST" enctype="multipart/form-data">
-                                            <div id="vue-uploadbox" class="vue-uploadbox-wrap p-10 bg-lighten br-8 position-relative bg-main-2">
-                                                <div class="d-flex br-8 fg-white h-100 w-100 border-white border-dashed border-1 bg-main-2">
-                                                    <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center gap-150">
-                                                        <label for="file-upload" class="d-flex flex-column align-items-center font-size-125 py-3">
-                                                            <i class="fa fa-cloud-upload-alt fa-5x vue-uploadbox-icon"></i>
-                                                            <span class="px-1 text-center vue-uploadbox-drop-text">Drop Files here</span>
-                                                            <input type="file" id="file-upload" name="file" style="display: none;" onchange="displayFileName()">
-                                                        </label>
-                                                        <button type="button" onclick="document.getElementById('file-upload').click()" class="btn btn-light font-size-125 font-weight-bold text-nowrap mb-0">
-                                                            Choose File
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        
-                                            <div class="form-group submit-btn-container d-flex align-items-center justify-content-between flex-wrap mb-0">
-                                                <div class="d-flex gap-10">
-                                                    <div id="selected-file-info" style="display: none;"></div>
-                                                    <button type="submit" class="btn btn-lg submit-btn white-space-nowrap mb-0 d-flex align-items-center gap-10" disabled>
-                                                        <strong class="text-uppercase convert_to">Start</strong>
-                                                        <i class="fa fa-arrow-right lh-inherit"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </form>
-                                        
-                                        <script>
-                                            function displayFileName() {
-                                                var fileInput = document.getElementById('file-upload');
-                                                var selectedFile = fileInput.files[0];
-                                                var fileInfoDiv = document.getElementById('selected-file-info');
-                                                fileInfoDiv.style.display = 'block';
-                                                fileInfoDiv.textContent = 'Selected File: ' + selectedFile.name;
-                                                document.querySelector('.submit-btn').removeAttribute('disabled');
-                                            }
-                                        </script>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+<div id="header" class="w-100 bg-white z-index-3 position-relative header-height-60">
+    <div class="px-4 pl-4 pt-0 h-100">
+        <div class="row justify-content-between h-100">
+            <nav class="navbar d-flex z-index-2 px-0 py-0 position-static h-100 justify-content-between flex-grow-md-0">
+                <div class="d-flex h-100 align-items-center pl-1 md-pl-4">
+                    <a class="navbar-brand pr-4 d-flex justify-content-start mr-0" href="/home" title="Different tools to compress all kinds of files">
+                        <h3 class="font-weight-bold text-capitalize text-center">File Compressor</h3>
+                    </a>
                 </div>
-            </div>
+
+                <div class="d-flex h-100 align-items-center pl-1 md-pl-4">
+                    <a class="navbar-brand pr-4 d-flex justify-content-start mr-0" href="/decompress" title="Different tools to compress all kinds of files">
+                        <h3 class="font-weight-bold text-capitalize text-center">File Decompressor</h3>
+                    </a>
+                </div>
+            </nav>
         </div>
     </div>
-
-    <div class="">
-   <div class="container" id="page_function_container">
-            <div class="clearfix"></div>
-            <div class="row">
-                
-                
-            </div>
-        </div> 
-
-    </div>
-
-    <h1>Compression Result</h1>
-    {% if check == 1 %}
-        <p>The image has been compressed successfully Download HERE!.</p>
-        <p>DOWNLOAD HERE!</p>
-        <p><a href="/download/{{ filename }}{{ ftype }}">Download Compressed Image</a></p>
-    {% elif check == -1 %}
-        <p>Error occurred during compression.</p>
-    {% else %}
-        <p>No file selected for compression.</p>
-    {% endif %}
+</div>
 
 
-    <div class="content-breaker pb-0 ">
 
-        <div class="color-stripe row w-100 no-margin ">
+<div id="post-header" class="post-header">
+    <div class="color-stripe row w-100 no-margin ">
         <div class="bg-main-1"></div>
         <div class="bg-main-2"></div>
         <div class="bg-main-3"></div>
@@ -157,14 +54,120 @@
         <div class="bg-main-7"></div>
         <div class="bg-main-8"></div>
     </div>
+</div>
 
-    <div class="bg-white border-top">
+    <div class="">
+        <div id="downloadEngineApp"></div>
+            <div class="main-content sub subcontent">
+                <div id="recaptchaContainer"></div>
 
+                <div class="container content-header">
+                        <div class="w-100 mx-0">
+                            <h1>Compress PDF</h1>
+                            <h2 class="text-left">Use this PDF compressor to reduce the file size of your PDF documents. Make PDFs smaller to send them via e-mail or upload them to the internet.</h2>
+                        </div>
+                </div>
+    
+    
+    
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 col-lg-12 d-flex flex-column gap-10">
+
+                    <div class="row">
+                        <div class="col-md-12 col-lg-12 d-flex flex-column gap-10">
+                            <div class="row">
+    
+                                <div class="col-12">
+                                    <div class="upload-container">                                                               
+                                        <div class="uploadbox-wrapper d-flex flex-column gap-5">
+    
+                                            <form action="/compressdoc" method="POST" enctype="multipart/form-data">
+                                                <div id="vue-uploadbox" class="vue-uploadbox-wrap p-10 bg-lighten br-8 position-relative bg-main-2">
+                                                    <div class="d-flex br-8 fg-white h-100 w-100 border-white border-dashed border-1 bg-main-2">
+                                                        <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center gap-150">
+                                                            <label for="file-upload" class="d-flex flex-column align-items-center font-size-125 py-3">
+                                                                <i class="fa fa-cloud-upload-alt fa-5x vue-uploadbox-icon"></i>
+                                                                <span class="px-1 text-center vue-uploadbox-drop-text">Drop Files here</span>
+                                                                <input type="file" id="file-upload" name="file" style="display: none;" onchange="displayFileName()">
+                                                            </label>
+                                                            <button type="button" onclick="document.getElementById('file-upload').click()" class="btn btn-light font-size-125 font-weight-bold text-nowrap mb-0">
+                                                                Choose File
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            
+                                                <div class="form-group submit-btn-container d-flex align-items-center justify-content-between flex-wrap mb-0">
+                                                    <div class="d-flex gap-10">
+                                                        <div id="selected-file-info" style="display: none;"></div>
+                                                        <button type="submit" class="btn btn-lg submit-btn white-space-nowrap mb-0 d-flex align-items-center gap-10" disabled>
+                                                            <strong class="text-uppercase convert_to">Start</strong>
+                                                            <i class="fa fa-arrow-right lh-inherit"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                            
+                                            <script>
+                                                function displayFileName() {
+                                                    var fileInput = document.getElementById('file-upload');
+                                                    var selectedFile = fileInput.files[0];
+                                                    var fileInfoDiv = document.getElementById('selected-file-info');
+                                                    fileInfoDiv.style.display = 'block';
+                                                    fileInfoDiv.textContent = 'Selected File: ' + selectedFile.name;
+                                                    document.querySelector('.submit-btn').removeAttribute('disabled');
+                                                }
+                                            </script>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row ">
+                        <div class="col-12">
+                            <div class="files-list files-list_v2 mb-0" id="fileuploadlist">
+                                <div id="vueUploadList"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+
+      
+    <h1>Compression Result</h1>
+    {% if check == 1 %}
+        <p>The document has been compressed successfully Download HERE!.</p>
+        <p>DOWNLOAD HERE!</p>
+        <p><a href="/download/{{ filename }}{{ ftype }}">Download Compressed Document</a></p>
+    {% elif check == -1 %}
+        <p>Error occurred during compression.</p>
+    {% else %}
+        <p>No file selected for compression.</p>
+    {% endif %}
+
+
+    <div class="content-breaker pb-0 ">
+        <div class="color-stripe row w-100 no-margin ">
+            <div class="bg-main-1"></div>
+            <div class="bg-main-2"></div>
+            <div class="bg-main-3"></div>
+            <div class="bg-main-4"></div>
+            <div class="bg-main-5"></div>
+            <div class="bg-main-6"></div>
+            <div class="bg-main-7"></div>
+            <div class="bg-main-8"></div>
+        </div>
+    </div>
 
     <div id="qg-toast-container">
         <div id="qg-toast"></div>
     </div>
-             
-    </body>
 
+    </body>
 </html>
