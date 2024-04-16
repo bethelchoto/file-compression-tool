@@ -4,6 +4,7 @@
 #include "stb_image.h" // Include stb_image header
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h" // Include stb_image_write header
+#include "error_handling.h"
 
 // Structure to hold a pixel
 typedef struct {
@@ -47,6 +48,8 @@ void saveImage(char* filename, int width, int height, Pixel* pixels) {
 
 int main(int argc, char **argv) {
 
+    setup_signal_handlers();
+    
     if (argc != 2)
     {
         printf("this is not how we decompress here- ./out <file>\n");

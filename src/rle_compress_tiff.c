@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <tiffio.h> // Include LibTIFF header
+#include "error_handling.h"
 
 // Structure to hold a pixel
 typedef struct {
@@ -19,8 +20,8 @@ typedef struct {
 uint32_t* loadImage(const char* filename, int* width, int* height) {
     TIFF* tif = TIFFOpen(filename, "r");
     if (!tif) {
-        fprintf(stderr, "Failed to open TIFF file\n");
-        return NULL;
+        report_error(ERROR_OPEN_INPUT_FILE);
+        return 2;
     }
 
     // Get image dimensions
@@ -31,17 +32,17 @@ uint32_t* loadImage(const char* filename, int* width, int* height) {
     // Allocate memory for pixel array
     uint32_t* pixels = (uint32_t*)malloc(npixels * sizeof(uint32_t));
     if (!pixels) {
-        fprintf(stderr, "Failed to allocate memory for pixel array\n");
+        report_error(ERROR_MEMORY_ALLOCATION);
         TIFFClose(tif);
-        return NULL;
+        return 3;
     }
 
     // Read image data
     if (!TIFFReadRGBAImageOriented(tif, *width, *height, pixels, ORIENTATION_TOPRIGHT, 0)) {
-        fprintf(stderr, "Failed to read image data\n");
+        report_error(ERROR_READ_FILE);
         free(pixels);
         TIFFClose(tif);
-        return NULL;
+        return 5;
     }
 
     TIFFClose(tif);
@@ -55,8 +56,8 @@ void compressRLE(const char* filename, FILE *output) {
     // Load image and create array of pixels
     uint32_t* pixels = loadImage(filename, &width, &height);
     if (!pixels) {
-        fprintf(stderr, "Failed to load image\n");
-        return;
+        report_error(ERROR_READ_FILE);
+        return 5;
     }
 
     printf("Image loaded successfully: %d x %d\n", width, height);
@@ -108,9 +109,10 @@ void compressRLE(const char* filename, FILE *output) {
 
 int main(int argc, char *argv[]) {
     // Load image using stb_image
+    setup_signal_handlers();
 
     if (argc != 2) {
-        fprintf(stderr, "Invalid cmd line arg. Usage: ./a.out <input file>\n");
+        report_error(ERROR_INVALID_CMD_ARG);
         return 1;
     }
 
@@ -133,7 +135,7 @@ int main(int argc, char *argv[]) {
         compressRLE(input_image_filename, compressedFile);
         fclose(compressedFile);
     } else {
-        printf("Failed to open file for writing\n");
+        report_error(ERROR_READ_FILE);
     }
 
     return 0;

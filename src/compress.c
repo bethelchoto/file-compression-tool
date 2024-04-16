@@ -4,6 +4,7 @@
 #include <math.h>
 #include "error_handling.h"
 
+
 #define MAX_FILENAME_LENGTH 100
 #define SPLIT_STRING "_compressed.bin"
 
@@ -32,6 +33,11 @@ typedef struct hashmap_entry *HASHMAP;
 NODE newleafnode(char c, int f)
 {
     NODE tmp = (NODE)malloc(sizeof(struct huffnode));
+    if (tmp == NULL){
+        report_error(ERROR_SIGSEGV);
+        return 12;
+    }
+    
     tmp->character = c;
     tmp->freq = f;
     tmp->left = NULL;
@@ -42,6 +48,10 @@ NODE newleafnode(char c, int f)
 NODE newinternalnode(int f)
 {
     NODE tmp = (NODE)malloc(sizeof(struct huffnode));
+    if (tmp == NULL){
+        report_error(ERROR_SIGSEGV);
+        return 12;
+    }
     tmp->character = 0;
     tmp->freq = f;
     tmp->left = NULL;
@@ -95,6 +105,10 @@ NODE mintop(HEAP heap)
 void insertnode(HEAP heap, NODE leftchild, NODE rightchild, int f)
 {
     NODE tmp = (NODE)malloc(sizeof(struct huffnode));
+    if (tmp == NULL){
+        report_error(ERROR_SIGSEGV);
+        return 12;
+    }
     tmp->character = '\0';
     tmp->freq = f;
     tmp->left = leftchild;
@@ -155,6 +169,8 @@ void print_huffman_tree(NODE root) {
 
 int main(int argc, char *argv[]) {
 
+    setup_signal_handlers();
+    
     // catch error from unpassed file
     if (argc != 2) {
         report_error(ERROR_INVALID_CMD_ARG);
