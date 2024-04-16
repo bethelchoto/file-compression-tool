@@ -2,13 +2,61 @@ import os
 import shutil
 import time
 import glob
-from flask import Flask, redirect, render_template, request, send_file, send_from_directory
+from flask import Flask, jsonify, redirect, render_template, request, send_file, send_from_directory, abort
+from werkzeug.exceptions import RequestTimeout, HTTPException, NotFound
 
 # Configure Application
 app = Flask(__name__)
 
+timeout_seconds = 120
+
 global filename
 global ftype
+
+'''
+ERROR HANDLING ROUTES
+'''
+@app.before_request
+def before_request():
+    request.start_time = time.time()
+
+@app.after_request
+def after_request(response):
+    elapsed_time = time.time() - request.start_time
+    if elapsed_time > timeout_seconds:
+        redirect('/timeout_error')
+    return response
+
+# 
+@app.route("/timeout_error")
+def handle_other_exception(e):
+    error = "Connection Timed Out, there is probably an issue\n" + e
+    return render_template("error_handling.html", error=error), 408
+
+@app.errorhandler(RequestTimeout)
+def handle_request_timeout_error(error):
+    return render_template('error_handling.html', error=error)
+
+@app.errorhandler(HTTPException)
+def handle_request_timeout_error(error):
+    return render_template('error_handling.html', error=error)
+
+@app.errorhandler(NotFound)
+def handle_request_timeout_error(error):
+    return render_template('error_handling.html', error=error)
+
+@app.errorhandler(500)
+def handle_other_exception(e):
+    return render_template("error_handling.html", error=e), 500
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    return render_template("error_handling.html", error=e), 500
+
+
+'''
+WEB ROUTES
+'''
 
 @app.route("/")
 @app.route("/home")
@@ -25,36 +73,22 @@ def home():
         os.remove(f)
     return render_template("index.html")
 
-@app.route("/compressimage")
-def compress_image():
-    return render_template("compress-image.html")
-
-@app.route("/compresszip")
-def compress_zip():
-    return render_template("compress-zip.html")
-
-@app.route("/compresstiff")
-def compress_tiff():
-    return render_template("compress-tiff.html")
-
-@app.route("/compressdoc")
-def compress_doc():
-    return render_template("compress-doc.html")
-
-@app.route("/decompresszip")
-def decompresszip():
-    return render_template("decompresszip.html")
-
 current_directory = os.path.dirname(os.path.abspath(__file__))
 
 file_upload_directory = os.path.join(current_directory, "temp")
 
 app.config["FILE_UPLOADS_TEMP"] = file_upload_directory
 
+file_upload_directory = os.path.join(current_directory, "uploads")
+
+app.config["FILE_UPLOADS"] = file_upload_directory
+
+app.config["DOWNLOAD_FOLDER"] = "downloads/"
+
 @app.route("/compresszip", methods=["GET", "POST"])
 def compresszip():
     if request.method == "GET":
-        return render_template("compress-zip.html", check=0)
+        return render_template("compress.html", action="/compresszip", check=0)
     else:
         up_file = request.files["file"]
         if len(up_file.filename) > 0:
@@ -69,38 +103,34 @@ def compresszip():
             while True:
                 if 'zipped/zipped.gz' in glob.glob('zipped/*.gz'):
                     os.system('mv zipped/zipped.gz downloads/')
-                    break
-            
-            return render_template("compress-zip.html", check=1, filename=filename, ftype=ftype)
+                    file_path = os.path.join(app.config["DOWNLOAD_FOLDER"], '{}{}'.format(filename, ftype))
+                    file_size = os.path.getsize(file_path)
+                    return render_template("compress.html", action="/compresszip", check=1, filename=filename, ftype=ftype, file_size=file_size)
         else:
             print("ERROR")
             return render_template("index.html", check=-1)
         
-file_upload_directory = os.path.join(current_directory, "uploads")
-
-app.config["FILE_UPLOADS"] = file_upload_directory
 
 @app.route("/compressimage", methods=["GET", "POST"])
 def compressimage():
     if request.method == "GET":
-        return render_template("compress-image.html", check=0)
+        return render_template("compress.html", action="/compressimage", check=0)
     else:
         up_file = request.files["file"]
         if len(up_file.filename) > 0:
             global filename
             global ftype
             filename = up_file.filename
-            print(up_file.filename)
             up_file.save(os.path.join(app.config["FILE_UPLOADS"], filename))
-            os.system('./executables/img_compress uploads/{}'.format(filename))            
+            os.system('./executables/img_compress uploads/{}'.format(filename))           
             filename = filename[:filename.index(".",1)]
             ftype = "_compressed.bin"
             while True:
                 if 'uploads/{}_compressed.bin'.format(filename) in glob.glob('uploads/*_compressed.bin'):
                     os.system('mv uploads/{}_compressed.bin downloads/'.format(filename))
-                    break
-           
-            return render_template("compress-image.html", check=1, filename=filename, ftype=ftype)
+                    file_path = os.path.join(app.config["DOWNLOAD_FOLDER"], '{}{}'.format(filename, ftype))
+                    file_size = os.path.getsize(file_path)
+                    return render_template("compress.html", action="/compressimage", check=1, filename=filename, ftype=ftype, file_size=file_size)
 
         else:
             print("ERROR")
@@ -110,7 +140,7 @@ def compressimage():
 @app.route("/compressdoc", methods=["GET", "POST"])
 def compressdoc():
     if request.method == "GET":
-        return render_template("compress-doc.html", check=0)
+        return render_template("compress.html", action="/compressdoc", check=0)
     else:
         up_file = request.files["file"]
         if len(up_file.filename) > 0:
@@ -126,8 +156,9 @@ def compressdoc():
             while True:
                 if 'uploads/{}_compressed.bin'.format(filename) in glob.glob('uploads/*_compressed.bin'):
                     os.system('mv uploads/{}_compressed.bin downloads/'.format(filename))
-                    break
-            return render_template("compress-doc.html", check=1, filename=filename, ftype=ftype)
+                    file_path = os.path.join(app.config["DOWNLOAD_FOLDER"], '{}{}'.format(filename, ftype))
+                    file_size = os.path.getsize(file_path)
+                    return render_template("compress.html", action="/compressdoc", check=1, filename=filename, ftype=ftype, file_size=file_size)
         else:
             print("ERROR")
             return render_template("index.html", check=-1)
@@ -135,7 +166,7 @@ def compressdoc():
 @app.route("/compresstiff", methods=["GET", "POST"])
 def compresstiff():
     if request.method == "GET":
-        return render_template("compress-tiff.html", check=0)
+        return render_template("compress.html", action="/compresstiff", check=0)
     else:
         up_file = request.files["file"]
         if len(up_file.filename) > 0:
@@ -150,26 +181,30 @@ def compresstiff():
             while True:
                 if 'uploads/{}_compressed.bin'.format(filename) in glob.glob('uploads/*_compressed.bin'):
                     os.system('mv uploads/{}_compressed.bin downloads/'.format(filename))
-                    break
-            return render_template("compress-tiff.html", check=1, filename=filename, ftype=ftype)
+                    file_path = os.path.join(app.config["DOWNLOAD_FOLDER"], '{}{}'.format(filename, ftype))
+                    file_size = os.path.getsize(file_path)
+                    return render_template("compress.html", action="/compresstiff", check=1, filename=filename, ftype=ftype, file_size=file_size)
         else:
             print("ERROR")
             return render_template("index.html", check=-1)
         
-app.config["DOWNLOAD_FOLDER"] = "downloads/"
+
 @app.route("/download/<filename>")
 def download_file(filename):
+    file_path = os.path.join(app.config["DOWNLOAD_FOLDER"], filename)
+    file_size = os.path.getsize(file_path)
+    print(file_size) 
     return send_from_directory(app.config["DOWNLOAD_FOLDER"], filename, as_attachment=True)     
 
 @app.route("/index2")
 @app.route("/decompress")
-def decomp():
+def decompress():
     return render_template("de-index.html")
 
 @app.route("/decompressimg", methods=["GET", "POST"])
-def decompress():
+def decompressimg():
     if request.method == "GET":
-        return render_template("decompress.html", check=0)
+        return render_template("decompress.html", action="/decompressimg", check=0)
     else:
         up_file = request.files["file"]
         if len(up_file.filename) > 0:
@@ -185,16 +220,17 @@ def decompress():
             while True:
                 if 'uploads/{}{}'.format(filename, ftype) in glob.glob('uploads/*_decompressed.*'):
                     os.system('mv uploads/{}{} downloads/'.format(filename, ftype))
-                    break
-            return render_template("decompress.html", check=1, filename=filename, ftype=ftype)
+                    file_path = os.path.join(app.config["DOWNLOAD_FOLDER"], '{}{}'.format(filename, ftype))
+                    file_size = os.path.getsize(file_path)
+                    return render_template("decompress.html", action="/decompressimg", check=1, filename=filename, ftype=ftype, file_size=file_size)
         else:
             print("ERROR")
-            return render_template("decompress.html", check=-1)
+            return render_template("de-index.html", check=-1)
         
 @app.route("/decompressfile", methods=["GET", "POST"])
 def decompressfile():
     if request.method == "GET":
-        return render_template("decompressfile.html", check=0)
+        return render_template("decompress.html", action="/decompressfile", check=0)
     else:
         up_file = request.files["file"]
         if len(up_file.filename) > 0:
@@ -210,18 +246,18 @@ def decompressfile():
             while True:
                 if 'uploads/{}{}'.format(filename, ftype) in glob.glob('uploads/*_decompressed.*'):
                     os.system('mv uploads/{}{} downloads/'.format(filename, ftype))
-                    break
-            # return render_template("decompress.html", check=1)
-            return render_template("decompressfile.html", check=1, filename=filename, ftype=ftype)
+                    file_path = os.path.join(app.config["DOWNLOAD_FOLDER"], '{}{}'.format(filename, ftype))
+                    file_size = os.path.getsize(file_path)
+                    return render_template("decompress.html", action="/decompressfile", check=1, filename=filename, ftype=ftype, file_size=file_size)
         else:
             print("ERROR")
-            return render_template("decompressfile.html", check=-1)
+            return render_template("de-index.html", check=-1)
         
 
 @app.route("/decompressedzip", methods=["GET", "POST"])
 def decompressedzip():
     if request.method == "GET":
-        return render_template("decompresszip.html", check=0)
+        return render_template("decompress.html", action="/decompresszip", check=0)
     else:
         up_file = request.files["file"]
         if len(up_file.filename) > 0:
@@ -235,9 +271,9 @@ def decompressedzip():
 
             filename = glob.glob(os.path.join('downloads/', "file_0*"))[0]
             filename = filename.split("/")[1]
-            print(filename)
-
-            return render_template("decompresszip.html", check=1, filename=filename)
+            file_path = os.path.join(app.config["DOWNLOAD_FOLDER"], '{}'.format(filename))
+            file_size = os.path.getsize(file_path)
+            return render_template("decompress.html", action="/decompresszip", check=1, filename=filename, ftype=ftype, file_size=file_size)
         else:
             print("ERROR")
             return render_template("decompress.html", check=-1)
