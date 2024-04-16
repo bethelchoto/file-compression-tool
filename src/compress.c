@@ -34,8 +34,8 @@ NODE newleafnode(char c, int f)
 {
     NODE tmp = (NODE)malloc(sizeof(struct huffnode));
     if (tmp == NULL){
-        report_error(ERROR_SIGSEGV);
-        return 12;
+        report_error(ERROR_MEMORY_ALLOCATION);
+        exit(12);
     }
     
     tmp->character = c;
@@ -49,8 +49,8 @@ NODE newinternalnode(int f)
 {
     NODE tmp = (NODE)malloc(sizeof(struct huffnode));
     if (tmp == NULL){
-        report_error(ERROR_SIGSEGV);
-        return 12;
+        report_error(ERROR_MEMORY_ALLOCATION);
+        exit(12);
     }
     tmp->character = 0;
     tmp->freq = f;
@@ -106,8 +106,8 @@ void insertnode(HEAP heap, NODE leftchild, NODE rightchild, int f)
 {
     NODE tmp = (NODE)malloc(sizeof(struct huffnode));
     if (tmp == NULL){
-        report_error(ERROR_SIGSEGV);
-        return 12;
+        report_error(ERROR_MEMORY_ALLOCATION);
+        exit(12);
     }
     tmp->character = '\0';
     tmp->freq = f;

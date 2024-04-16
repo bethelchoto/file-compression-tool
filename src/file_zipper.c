@@ -118,7 +118,7 @@ int compress_folder(const char *source_folder, const char *dest_file) {
                     strm.next_out = out;
                     ret = deflate(&strm, Z_FINISH);
                     if (ret == Z_STREAM_ERROR) {
-                        report_error(ERROR_UNEXPECTED_EOF)
+                        report_error(ERROR_UNEXPECTED_EOF);
                         deflateEnd(&strm);
                         fclose(source_file);
                         fclose(dest);

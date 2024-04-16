@@ -46,48 +46,50 @@ Compression: The Zlib algorithm compresses input data using a combination of LZ7
 Decompression: During decompression, the Zlib algorithm reverses the compression process, reconstructing the original input data from the compressed representation using LZ77 decoding and Huffman decoding.
 
 
-### Installing
+# Installing
 
 * Install the following dependencies using BASH
 
-# Install Flask
-pip install flask
+### Install Python 3
+`sudo apt-get install python3`
 
-# Install Python 3
-sudo apt-get install python3
+### Install Flask
+`pip3 install flask`
 
 ### Executing program
 
 1. Navigate to the <FILE_COMPRESSION_TOOL> directory in your terminal.
 
-2. Run the following command 
-    - python3 app.py
+2. Run the following command
+
+    `python3 app.py`
 
 3. Make sure that app.py is available in the directory.
 
-4. After running the command, a link will appear in your terminal e.g - http://127.0.0.1:5000. Ctrl + click on the link to open it in your default browser. This will launch the application.
+4. After running the command, a link will appear in your terminal e.g - `http://127.0.0.1:5000`. 
+Ctrl + click on the link to open it in your default browser. This will launch the application.
 
 5. Once the application is open in your browser, you can navigate through the site to perform file compression tasks.
 
 * available options for navigation
 
 UNDER COMPRESSION THE USER WILL BE ABLE TO DO THE FOLLOWING OPERATIONS 
-compress image
-compress documents 
-compress tiff
-create a zip file
+
+ - compress image
+ - compress documents 
+ - compress tiff
+ - create a zip file
 
 UNDER DECOMPRESSION THE USER WILL BE ABLE TO DO THE FOLLOWING OPERATIONS 
-decompress all images
-decompress documents
-unzip a zip file
+ - decompress all images
+ - decompress documents
+ - unzip a zip file
 
 ## Shutting Down the Program
-* To shut down the program, simply press Ctrl + C  in the terminal where the program is running or kill -9 <pid> in a different terminal.
+* To shut down the program, simply press `Ctrl + C`  in the terminal where the program is running or `kill -9 <pid>` in a different terminal.
 
 ## Authors
 
-Contributors names and contact info
 
 1. Bethel Panashe Choto
 2. Tinotenda Rodney Alfaneti

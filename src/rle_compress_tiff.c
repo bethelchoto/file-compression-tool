@@ -21,7 +21,7 @@ uint32_t* loadImage(const char* filename, int* width, int* height) {
     TIFF* tif = TIFFOpen(filename, "r");
     if (!tif) {
         report_error(ERROR_OPEN_INPUT_FILE);
-        return 2;
+        return (uint32_t *)2;
     }
 
     // Get image dimensions
@@ -34,7 +34,7 @@ uint32_t* loadImage(const char* filename, int* width, int* height) {
     if (!pixels) {
         report_error(ERROR_MEMORY_ALLOCATION);
         TIFFClose(tif);
-        return 3;
+        return (uint32_t *)3;
     }
 
     // Read image data
@@ -42,7 +42,7 @@ uint32_t* loadImage(const char* filename, int* width, int* height) {
         report_error(ERROR_READ_FILE);
         free(pixels);
         TIFFClose(tif);
-        return 5;
+        return (uint32_t *)5;
     }
 
     TIFFClose(tif);
@@ -57,7 +57,7 @@ void compressRLE(const char* filename, FILE *output) {
     uint32_t* pixels = loadImage(filename, &width, &height);
     if (!pixels) {
         report_error(ERROR_READ_FILE);
-        return 5;
+        return;
     }
 
     printf("Image loaded successfully: %d x %d\n", width, height);
