@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <zlib.h>
+#include "error_handling.h"
 
 #define CHUNK_SIZE 16384
 
@@ -13,6 +14,9 @@ int compress_folder(const char *source_folder, const char *dest_file);
 int decompress_folder(const char *source_file, const char *dest_folder);
 
 int main(int argc, char *argv[]) {
+
+    setup_signal_handlers();
+
     if (argc != 4) {
         printf("Usage: %s <command> <source> <destination>\n", argv[0]);
         return 1;
@@ -25,19 +29,19 @@ int main(int argc, char *argv[]) {
     if (strcmp(command, "compress") == 0) {
         int ret = compress_folder(source, dest);
         if (ret != Z_OK) {
-            printf("Compression failed with error code %d\n", ret);
-            return 1;
+            report_error(ERROR_UNEXPECTED_EOF);
+            return 7;
         }
         printf("Compression successful\n");
     } else if (strcmp(command, "decompress") == 0) {
         int ret = decompress_folder(source, dest);
         if (ret != Z_OK) {
-            printf("Decompression failed with error code %d\n", ret);
-            return 1;
+            report_error(ERROR_UNEXPECTED_EOF);
+            return 7;
         }
         printf("Decompression successful\n");
     } else {
-        printf("Invalid command. Please use 'compress' or 'decompress'\n");
+        report_error(ERROR_INVALID_CMD_ARG);
         return 1;
     }
 
@@ -54,8 +58,8 @@ int compress_folder(const char *source_folder, const char *dest_file) {
 
     FILE *dest = fopen(dest_file, "wb");
     if (!dest) {
-        perror("Error opening destination file");
-        return Z_ERRNO;
+        report_error(ERROR_CREATE_OUTPUT_FILE);
+        return 6;
     }
 
     strm.zalloc = Z_NULL;
@@ -64,17 +68,17 @@ int compress_folder(const char *source_folder, const char *dest_file) {
 
     ret = deflateInit(&strm, Z_DEFAULT_COMPRESSION);
     if (ret != Z_OK) {
-        printf("Compression initialization failed with error code %d\n", ret);
+        report_error(ERROR_UNEXPECTED_EOF);
         fclose(dest);
-        return ret;
+        return 7;
     }
 
     dir = opendir(source_folder);
     if (!dir) {
-        perror("Error opening source folder");
+        report_error(ERROR_INVALID_FILENAME);
         deflateEnd(&strm);
         fclose(dest);
-        return Z_ERRNO;
+        return 4;
     }
 
     while ((entry = readdir(dir)) != NULL) {
@@ -84,11 +88,11 @@ int compress_folder(const char *source_folder, const char *dest_file) {
 
             FILE *source_file = fopen(filepath, "rb");
             if (!source_file) {
-                perror("Error opening source file");
+                report_error(ERROR_OPEN_INPUT_FILE);
                 deflateEnd(&strm);
                 fclose(dest);
                 closedir(dir);
-                return Z_ERRNO;
+                return 2;
             }
 
             printf("Compressing file: %s\n", entry->d_name);
@@ -99,12 +103,12 @@ int compress_folder(const char *source_folder, const char *dest_file) {
                     if (feof(source_file)) {
                         break;
                     } else if (ferror(source_file)) {
-                        printf("Error reading from source file\n");
+                        report_error(ERROR_READ_FILE);
                         deflateEnd(&strm);
                         fclose(source_file);
                         fclose(dest);
                         closedir(dir);
-                        return Z_ERRNO;
+                        return 5;
                     }
                 }
                 strm.next_in = in;
@@ -114,12 +118,12 @@ int compress_folder(const char *source_folder, const char *dest_file) {
                     strm.next_out = out;
                     ret = deflate(&strm, Z_FINISH);
                     if (ret == Z_STREAM_ERROR) {
-                        printf("Compression error\n");
+                        report_error(ERROR_UNEXPECTED_EOF)
                         deflateEnd(&strm);
                         fclose(source_file);
                         fclose(dest);
                         closedir(dir);
-                        return ret;
+                        return 7;
                     }
                     fwrite(out, 1, CHUNK_SIZE - strm.avail_out, dest);
                 } while (strm.avail_out == 0);
@@ -146,8 +150,8 @@ int decompress_folder(const char *source_file, const char *dest_folder) {
 
     FILE *source = fopen(source_file, "rb");
     if (!source) {
-        perror("Error opening source file");
-        return Z_ERRNO;
+        report_error(ERROR_OPEN_INPUT_FILE);
+        return 2;
     }
 
     strm.zalloc = Z_NULL;
@@ -156,9 +160,9 @@ int decompress_folder(const char *source_file, const char *dest_folder) {
 
     ret = inflateInit(&strm);
     if (ret != Z_OK) {
-        printf("Decompression initialization failed with error code %d\n", ret);
+        report_error(ERROR_UNEXPECTED_EOF);
         fclose(source);
-        return ret;
+        return 7;
     }
 
     mkdir(dest_folder, 0777); // Create the destination folder if it doesn't exist
@@ -168,20 +172,20 @@ int decompress_folder(const char *source_file, const char *dest_folder) {
         snprintf(filename, sizeof(filename), "%s/file_%d.txt", dest_folder, file_count++); // Generate a unique file name
         FILE *dest_file = fopen(filename, "wb");
         if (!dest_file) {
-            printf("Error creating destination file\n");
+            report_error(ERROR_CREATE_OUTPUT_FILE);
             inflateEnd(&strm);
             fclose(source);
-            return Z_ERRNO;
+            return 6;
         }
 
         while (1) {
             strm.avail_in = fread(in, 1, CHUNK_SIZE, source);
             if (ferror(source)) {
-                printf("Error reading from source file\n");
+                report_error(ERROR_INVALID_FILENAME);
                 inflateEnd(&strm);
                 fclose(source);
                 fclose(dest_file);
-                return Z_ERRNO;
+                return 4;
             }
             if (strm.avail_in == 0)
                 break;
@@ -195,11 +199,12 @@ int decompress_folder(const char *source_file, const char *dest_folder) {
                     case Z_NEED_DICT:
                     case Z_DATA_ERROR:
                     case Z_MEM_ERROR:
-                        printf("Decompression error\n");
+                        // printf("Decompression error\n");
+                        report_error(ERROR_UNEXPECTED_EOF);
                         inflateEnd(&strm);
                         fclose(source);
                         fclose(dest_file);
-                        return ret;
+                        return 7;
                 }
                 fwrite(out, 1, CHUNK_SIZE - strm.avail_out, dest_file);
             } while (strm.avail_out == 0);

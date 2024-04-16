@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "error_handling.h"
 
 // Define a struct to represent a key-value pair
 typedef struct {
@@ -35,8 +36,9 @@ char findKey(Hash_map *decode_map, int map_size, char *key) {
 char *dectobin(int decimal) {
     char *s = malloc(9 * sizeof(char)); // 8 bits + 1 for null terminator
     if (s == NULL) {
-        fprintf(stderr, "Error allocating memory for binary string.\n");
-        exit(1);
+        // fprintf(stderr, "Error allocating memory for binary string.\n");
+        report_error(ERROR_MEMORY_ALLOCATION);
+        return 3;
     }
 
     // Starting from the leftmost bit (most significant bit)
@@ -49,8 +51,10 @@ char *dectobin(int decimal) {
 
 int main(int argc, char *argv[]) {
 
+    setup_signal_handlers();
+
     if (argc != 2) {
-        fprintf(stderr, "Invalid cmd line arg. Usage: ./a.out <input file>\n");
+        report_error(ERROR_INVALID_CMD_ARG);
         return 1;
     }
 
@@ -60,7 +64,7 @@ int main(int argc, char *argv[]) {
     
     
     if (input == NULL) {
-        fprintf(stderr, "Error opening input file\n");
+        report_error(ERROR_OPEN_INPUT_FILE);
         return 2;
     }
 
@@ -70,7 +74,7 @@ int main(int argc, char *argv[]) {
     char *out = malloc(strlen(in) + 16); 
      
     if (out == NULL) {
-        fprintf(stderr, "Error allocating memory for output filename.\n");
+        report_error(ERROR_MEMORY_ALLOCATION);
         fclose(input);
         return 3;
     }
@@ -78,9 +82,9 @@ int main(int argc, char *argv[]) {
     // Find the position of "-compressed" in the input filename
     char *pos = strstr(argv[1], "_compressed");
     if (pos == NULL) {
-        fprintf(stderr, "Error: Input file name does not contain \"_compressed\"\n");
+        report_error(ERROR_INVALID_INPUT_FORMAT);
         fclose(input);
-        return 1;
+        return 8;
     }
 
     // Calculate the length of the filename without the "-compressed" part
@@ -104,10 +108,10 @@ int main(int argc, char *argv[]) {
     FILE *output = fopen(out, "w");
 
     if (output == NULL) {
-        fprintf(stderr, "Error creating output file\n");
+        report_error(ERROR_CREATE_OUTPUT_FILE);
         fclose(input);
         free(out);
-        return 3;
+        return 6;
     }
 
     // Create and initialize a dynamic array of kv_pair_t structs
@@ -116,7 +120,7 @@ int main(int argc, char *argv[]) {
     Hash_map decode_map[256];
 
     if (decode_map == NULL) {
-        fprintf(stderr, "Error allocating memory for decode map.\n");
+        report_error(ERROR_MEMORY_ALLOCATION);
         fclose(input);
         fclose(output);
         free(out);

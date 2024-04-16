@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h" // Include stb_image header
+#include "error_handling.h"
 
 // Structure to hold a pixel
 typedef struct {
@@ -39,12 +40,13 @@ void compressRLE(Image *input, FILE *output) {
     }
 }
 
-
 int main(int argc, char *argv[]) {
     // Load image using stb_image
 
+    setup_signal_handlers();
+
     if (argc != 2) {
-        fprintf(stderr, "Invalid cmd line arg. Usage: ./a.out <input file>\n");
+        report_error(ERROR_INVALID_CMD_ARG);
         return 1;
     }
 
@@ -54,8 +56,8 @@ int main(int argc, char *argv[]) {
     unsigned char *image_data = stbi_load(input_image_filename, &width, &height, &channels, STBI_rgb);
 
     if (image_data == NULL) {
-        printf("Failed to load image\n");
-        return 1;
+        report_error(ERROR_READ_FILE);
+        return 5;
     }
 
     printf("Image loaded successfully\n");
@@ -95,7 +97,8 @@ int main(int argc, char *argv[]) {
         printf("Compression completed successfully\n");
         printf("Compressed image dimensions: %d x %d\n", input.width, input.height);
     } else {
-        printf("Failed to open file for writing\n");
+        report_error(ERROR_OPEN_INPUT_FILE);
+        return 2;
     }
 
 
