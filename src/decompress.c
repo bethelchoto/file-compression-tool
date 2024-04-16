@@ -36,9 +36,8 @@ char findKey(Hash_map *decode_map, int map_size, char *key) {
 char *dectobin(int decimal) {
     char *s = malloc(9 * sizeof(char)); // 8 bits + 1 for null terminator
     if (s == NULL) {
-        // fprintf(stderr, "Error allocating memory for binary string.\n");
         report_error(ERROR_MEMORY_ALLOCATION);
-        return 3;
+        exit(3);
     }
 
     // Starting from the leftmost bit (most significant bit)

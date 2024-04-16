@@ -193,7 +193,6 @@ def compresstiff():
 def download_file(filename):
     file_path = os.path.join(app.config["DOWNLOAD_FOLDER"], filename)
     file_size = os.path.getsize(file_path)
-    print(file_size) 
     return send_from_directory(app.config["DOWNLOAD_FOLDER"], filename, as_attachment=True)     
 
 @app.route("/index2")
@@ -254,7 +253,7 @@ def decompressfile():
             return render_template("de-index.html", check=-1)
         
 
-@app.route("/decompressedzip", methods=["GET", "POST"])
+@app.route("/decompresszip", methods=["GET", "POST"])
 def decompressedzip():
     if request.method == "GET":
         return render_template("decompress.html", action="/decompresszip", check=0)
@@ -270,8 +269,10 @@ def decompressedzip():
             os.system('./executables/zipper decompress uploads/zipped.gz downloads'.format(filename))  
 
             filename = glob.glob(os.path.join('downloads/', "file_0*"))[0]
-            filename = filename.split("/")[1]
-            file_path = os.path.join(app.config["DOWNLOAD_FOLDER"], '{}'.format(filename))
+            filename_ = filename.split("/")[1]
+            filename = filename_.split(".")[0]
+            ftype = "." + filename_.split(".")[1]
+            file_path = os.path.join(app.config["DOWNLOAD_FOLDER"], '{}{}'.format(filename, ftype))
             file_size = os.path.getsize(file_path)
             return render_template("decompress.html", action="/decompresszip", check=1, filename=filename, ftype=ftype, file_size=file_size)
         else:
