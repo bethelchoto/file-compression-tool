@@ -55,8 +55,8 @@
                 <div id="recaptchaContainer"></div>
                 <div class="container content-header">
                     <div class="w-100 mx-0">
-                        <h1>Decompress Files</h1>
-                        <h2 class="text-left">Use this application to decompress images</h2>
+                        <h1>Upload, Click Start, and Wait</h1>
+                        <h2 class="text-left">NB: After clicking start, it might take a while loading but please be patient, the file will be ready under Decompression Result</h2>
                     </div>
                 </div>
 
@@ -69,14 +69,14 @@
                                 <div class="col-12">
                                     <div class="upload-container">                                                               
                                         <div class="uploadbox-wrapper d-flex flex-column gap-5">
-                                            <form action="/decompressimg" method="POST" enctype="multipart/form-data">
+                                            <form action="{{ action }}" method="POST" enctype="multipart/form-data">
                                                 <div id="vue-uploadbox" class="vue-uploadbox-wrap p-10 bg-lighten br-8 position-relative bg-main-2">
                                                     <div class="d-flex br-8 fg-white h-100 w-100 border-white border-dashed border-1 bg-main-2">
                                                         <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center gap-150">
                                                             <label for="file-upload" class="d-flex flex-column align-items-center font-size-125 py-3">
                                                                 <i class="fa fa-cloud-upload-alt fa-5x vue-uploadbox-icon"></i>
                                                                 <span class="px-1 text-center vue-uploadbox-drop-text">Drop Files here</span>
-                                                                <input type="file" id="file-upload" name="file" style="display: none;" onchange="displayFileName()">
+                                                                <input type="file" id="file-upload" name="file" style="display: none;" onchange="displayFileProperties()">
                                                             </label>
                                                             <button type="button" onclick="document.getElementById('file-upload').click()" class="btn btn-light font-size-125 font-weight-bold text-nowrap mb-0">
                                                                 Choose File
@@ -97,12 +97,30 @@
                                             </form>
                                             
                                             <script>
-                                                function displayFileName() {
+                                                function displayFileProperties() {
                                                     var fileInput = document.getElementById('file-upload');
                                                     var selectedFile = fileInput.files[0];
+                                        
                                                     var fileInfoDiv = document.getElementById('selected-file-info');
                                                     fileInfoDiv.style.display = 'block';
-                                                    fileInfoDiv.textContent = 'Selected File: ' + selectedFile.name;
+                                        
+                                                    // Display file name
+                                                    fileInfoDiv.innerHTML = '<strong>Selected File:</strong> ' + selectedFile.name + '<br>';
+                                        
+                                                    // Display file size
+                                                    var fileSizeInBytes = selectedFile.size;
+                                                    var fileSizeInKB = fileSizeInBytes / 1024;
+                                                    fileInfoDiv.innerHTML += '<strong>Size:</strong> ' + fileSizeInKB.toFixed(2) + ' KB<br>';
+                                        
+                                                    // Display file type (extension)
+                                                    var fileType = selectedFile.name.split('.').pop();
+                                                    fileInfoDiv.innerHTML += '<strong>Type:</strong> ' + fileType.toUpperCase() + '<br>';
+                                        
+                                                    // Display file creation date (if available)
+                                                    if (selectedFile.lastModifiedDate) {
+                                                        var creationDate = selectedFile.lastModifiedDate.toLocaleDateString();
+                                                        fileInfoDiv.innerHTML += '<strong>Creation Date:</strong> ' + creationDate + '<br>';
+                                                    }
                                                     document.querySelector('.submit-btn').removeAttribute('disabled');
                                                 }
                                             </script>
@@ -127,14 +145,15 @@
     </div>
       
     <h1>Decompression Result</h1>
-    {% if check == 1 %}
-        <p>The document has been decompressed successfully.</p>
-        <p>DOWNLOAD HERE!</p>
-        <p><a href="/download/{{ filename }}{{ ftype }}">Download decompressed file</a></p>
-    {% elif check == -1 %}
-        <p>Error occurred during compression.</p>
+    {% if check == 1  and file_size != 0 %}
+        <p>The file has been decompressed successfully.</p>
+        <p>File Name: {{ filename }}{{ ftype }}</p>
+        <p>File Size: {{ file_size / 1024 }} kilobytes</p>
+        <p><a href="/download/{{ filename }}{{ ftype }}">Download Decompressed File</a></p>
+    {% elif check == -1 or file_size == 0 %}
+        <p>Error occurred during decoompression.</p>
     {% else %}
-        <p>No file selected for compression.</p>
+        <p>No file selected for decompression.</p>
     {% endif %}
 
     <div class="content-breaker pb-0 ">
