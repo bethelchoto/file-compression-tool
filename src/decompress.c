@@ -4,12 +4,12 @@
 
 // Define a struct to represent a key-value pair
 typedef struct {
-    char key[20];  
+    char key[127];  
     char value;
 } Hash_map;
 
 void addEntryToMap(Hash_map *decode_map, int *num_of_unique_chars, char *key, char value) {
-    if (*num_of_unique_chars >= 16) {
+    if (*num_of_unique_chars >= 127) {
         // Resize the decode_map if needed (for simplicity, this example doesn't include the resizing logic)
         fprintf(stderr, "Decode map is full.\n");
         exit(1);
